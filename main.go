@@ -81,6 +81,21 @@ func deleteAlbum(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
+func searchAlbums(c *gin.Context) {
+	artist := c.Query("artist")
+	title := c.Query("title")
+
+	var results []album
+
+	for _, a := range albums {
+		if (artist == "" || a.Artist == artist) && (title == "" || a.Title == title) {
+			results = append(results, a)
+		}
+	}
+
+	c.IndentedJSON(http.StatusOK, results)
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
@@ -88,6 +103,7 @@ func main() {
 	router.POST("/albums", postAlbums)
 	router.PUT("/albums/:id", updateAlbum)
 	router.DELETE("/albums/:id", deleteAlbum)
+	router.GET("/search", searchAlbums)
 
 	router.Run("localhost:8080")
 }
